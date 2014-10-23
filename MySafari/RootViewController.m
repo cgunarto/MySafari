@@ -16,6 +16,7 @@
 @property (weak, nonatomic) IBOutlet UILabel *webPageTitle;
 @property (weak, nonatomic) IBOutlet UIButton *backButton;
 @property (weak, nonatomic) IBOutlet UIButton *forwardButton;
+@property (nonatomic) CGFloat previousOffset;
 
 @end
 
@@ -86,18 +87,28 @@
 
 -(void)scrollViewDidScroll:(UIScrollView *)scrollView {
 
-    CGFloat totalScroll = self.webView.frame.size.height - self.webView.bounds.size.height;
+    CGFloat totalScroll = scrollView.contentSize.height - scrollView.bounds.size.height;
 
-    /* This is the current offset. */
-    CGFloat offset = - scrollView.contentOffset.y;
+    CGFloat offset = scrollView.contentOffset.y;
 
-    /* This is the percentage of the current offset / bottom offset. */
     CGFloat percentage = offset / totalScroll;
 
-    /* When percentage = 0, the alpha should be 1 so we should flip the percentage. */
-    self.urlTextField.alpha = (1.f - percentage);
+    if (scrollView.contentOffset.y > self.previousOffset) {
 
+        NSLog(@"%f", scrollView.contentOffset.y);
+
+        [UIView animateWithDuration:0.8 animations:^{
+            self.urlTextField.frame = CGRectMake(self.urlTextField.frame.origin.x, self.urlTextField.frame.origin.y - percentage, self.urlTextField.frame.size.width, self.urlTextField.frame.size.height);
+        }];
+    } else {
+        [UIView animateWithDuration:0.8 animations:^{
+            self.urlTextField.frame = CGRectMake(self.urlTextField.frame.origin.x, self.urlTextField.frame.origin.y + percentage, self.urlTextField.frame.size.width, self.urlTextField.frame.size.height);
+        }];
+    }
+
+    self.previousOffset = scrollView.contentOffset.y;
 }
+
 
 
 
